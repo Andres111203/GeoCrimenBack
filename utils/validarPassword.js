@@ -5,3 +5,5 @@ export const validarPassword = (password) => {
 
 console.log(validarPassword('Andres'));
 console.log(validarPassword('andRes1103'));
+
+
