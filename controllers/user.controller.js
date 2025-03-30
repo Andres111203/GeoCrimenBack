@@ -1,6 +1,7 @@
 import { UserModel } from "../models/user.model.js";
 import { validarPassword } from "../utils/validarPassword.js";
 import bycript from 'bcrypt'
+import jwt from 'jsonwebtoken'
 // /api/register
 const register = async(req, res) => {
     try{
@@ -32,16 +33,20 @@ const register = async(req, res) => {
 
         
 
-        // const user = await UserModel.findOneByEmail(email);
+        const user = await UserModel.findOneByEmail(email);
 
-        // if(user){
-        //     return res.status(409).json({
-        //     ok: false,
-        //     msg: "el usuario ya está registrado"
-        // })}
+        if(user){
+            return res.status(409).json({
+            ok: false,
+            msg: "el usuario ya está registrado"
+        })}
 
-        const nuevoAvion = await UserModel.create({id_usuario, nombre, apellido, email,contrasenia,rol_id, fecha_registro, fecha_nacimiento})
+        const salt = await bycript.genSalt(10)
+        const hashedPAssword = await bycript.hash(contrasenia, salt)
+
+        const nuevoAvion = await UserModel.create({id_usuario, nombre, apellido, email, contrasenia: hashedPAssword,rol_id, fecha_registro, fecha_nacimiento})
         return res.json({ok: true, msg: nuevoAvion})
+
     }catch(error){
         console.log(error);
         res.status(500).json({
@@ -53,7 +58,39 @@ const register = async(req, res) => {
 
 }
 
+const login = async(req, res) => {
+    try{
+        const {email, contrasenia} = req.body;
+        const usuario = await UserModel.findOneByEmail(email)
+
+        if(!usuario){
+            return res.status(400).json({ok: false, msg: "el usuario no está registrado"})
+        }
+        if(!email || !contrasenia){
+            return res.status(400).json({ok:false, msg: "Todos los campos son obligatorios"})
+        }
+
+        const isEqual = await bycript.compare(contrasenia, usuario.contrasenia)
+        if(!isEqual){
+            return res.status(400).json({ok: false, msg:"Contraseña incorrecta"})
+        }
+
+        const token = jwt.sign({
+            email: usuario.email, role: usuario.rol_id
+        },
+            process.env.KEY_JWT,
+            {
+                "expiresIn": "1h"
+            }
+    )
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({ok: false, msg: "error del servidor"})
+    }
+}
+
 export const UserController = {
-    register
+    register,
+    login
 
 }

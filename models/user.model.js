@@ -9,7 +9,7 @@ const create = async ({
 
     const query = "INSERT INTO users (id_usuario, nombre, apellido, email, contrasenia, rol_id, fecha_registro, fecha_nacimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     const values = [id_usuario, nombre, apellido, email, contrasenia, rol_id, fecha_registro, fecha_nacimiento];
-    connection.query(query, values, function (err, result) {
+    await connection.query(query, values, function (err, result) {
       if (err) throw err;
       console.log("Usuario creado con exito", result.insertId);
     })
@@ -20,16 +20,18 @@ const create = async ({
 
 
 
-// const findOneByEmail = async(email) => { 
-//   const query = `
-//         SELECT * FROM users 
-//         WHERE EMAIL = ?
-//     `
-//   connection.query(sql)
-
-// }
+const findOneByEmail = async(email) => { 
+  return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE EMAIL = ?"
+      const values = [email]
+      connection.query(query, values, (err, result) => {
+        if(err) return reject(err);
+        resolve(result[0]);
+      })
+    })
+}
 
 export const UserModel = {
-  create,
-  //findOneByEmail
+    create,
+    findOneByEmail
 }
