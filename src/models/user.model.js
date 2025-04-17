@@ -1,4 +1,4 @@
-import { connection } from '../database/db_connect.js'
+import { db } from '../database/db_connect.js'
 
 const create = async ({
   id_usuario, nombre, apellido, email,
