@@ -15,6 +15,20 @@ Content-Type: application/json
   "Id_estado": 1
 }
 
-
 ###
+
+GET http://localhost:3000/api/usuarios
+###
+POST http://localhost:3000/api/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Camilo pablo",
+  "apellido": "Perez Pereira",
+  "email": "PerezPerreira@gmail.com",
+  "contrasenia": "5489635asdaw",
+  "rol": 1,
+  "fechaRegistro": "2025-04-15 15:00:00",
+  "fechaNacimiento": "2002-04-12"
+}
 
