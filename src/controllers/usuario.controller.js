@@ -46,12 +46,12 @@ export const agregarUsuarios = async (req, res) => {
                 message: "Error interno al insertar reporte",
                 error: error.message
             });
-        
+
     }
 };
 
-export const eliminarUsuario = async(req,res) =>{
-    const {id} = req.params;
+export const eliminarUsuario = async (req, res) => {
+    const { id } = req.params;
     const sql = 'DELETE  FROM usuario WHERE Id_usuario = ?'
     try {
         const [rows] = await db.query(sql, [id])
@@ -64,6 +64,41 @@ export const eliminarUsuario = async(req,res) =>{
             error: error.message
 
         });
-        
+
     }
+};
+
+export const actualizarUsuario = async (req, res) => {
+    const { id } = req.params;
+    const {
+        nombre,
+        apellido,
+        email,
+        contrasenia,
+        rol,
+        fechaRegistro,
+        fechaNacimiento } = req.body;
+
+    const sql = 'UPDATE usuario set nombre = ?, apellido = ?, email = ?, contrasenia = ?, rol = ?, fechaRegistro = ?, fechaNacimiento = ? WHERE Id_usuario = ?';
+    try {
+        const [rows] = await db.query(sql, [
+            nombre,
+            apellido,
+            email,
+            contrasenia,
+            rol,
+            fechaRegistro,
+            fechaNacimiento,
+            id]);
+
+        res.json({ message: 'Actualizado con exito' });
+
+    } catch (error) {
+        console.error('No se pudo llevar a cabo la actualizacion del usuario');
+        return res.status(500).json({
+            message: 'Error interno para actualizar usuario',
+            error: error.message
+        });
+    }
+
 };

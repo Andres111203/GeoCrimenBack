@@ -35,3 +35,16 @@ Content-Type: application/json
 ###Eliminar usuario
 DELETE http://localhost:3000/api/usuarios/9
 
+###Actualizar usuario
+PUT http://localhost:3000/api/usuarios/8
+Content-Type: application/json
+
+{
+  "nombre": "Pablo",
+  "apellido": "Escobar",
+  "email": "Elpatrondelmal@gmail.com",
+  "contrasenia": "plataoplomo",
+  "rol": 1,
+  "fechaRegistro": "2025-04-15 15:00:00",
+  "fechaNacimiento": "2002-04-12"
+}
