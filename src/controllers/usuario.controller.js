@@ -49,3 +49,21 @@ export const agregarUsuarios = async (req, res) => {
         
     }
 };
+
+export const eliminarUsuario = async(req,res) =>{
+    const {id} = req.params;
+    const sql = 'DELETE  FROM usuario WHERE Id_usuario = ?'
+    try {
+        const [rows] = await db.query(sql, [id])
+        res.status(201).json({
+            message: 'Usuario eliminado con exito'
+        });
+    } catch (error) {
+        console.error('Error al eliminar al usuario');
+        return res.status(500).json({
+            error: error.message
+
+        });
+        
+    }
+};

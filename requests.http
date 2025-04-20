@@ -32,3 +32,6 @@ Content-Type: application/json
   "fechaNacimiento": "2002-04-12"
 }
 
+###Eliminar usuario
+DELETE http://localhost:3000/api/usuarios/9
+
