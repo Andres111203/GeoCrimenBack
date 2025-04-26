@@ -48,3 +48,12 @@ Content-Type: application/json
   "fechaRegistro": "2025-04-15 15:00:00",
   "fechaNacimiento": "2002-04-12"
 }
+
+###
+GET http://localhost:3000/api/paises
+
+###
+GET http://localhost:3000/api/ciudades/1
+
+###
+GET http://localhost:3000/api/barrios/26
