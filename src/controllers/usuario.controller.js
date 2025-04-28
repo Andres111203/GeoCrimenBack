@@ -20,9 +20,11 @@ export const agregarUsuarios = async (req, res) => {
         email,
         contrasenia,
         rol,
-        fechaRegistro,
-        fechaNacimiento } = req.body
-    const sql = 'INSERT INTO usuario (nombre,apellido,email,contrasenia,rol,fechaRegistro, fechaNacimiento) VALUES (?,?,?,?,?,?,?)';
+        fechaNacimiento,
+        barrio } = req.body
+
+    const fechaRegistro = new Date();
+    const sql = 'INSERT INTO usuario (nombre,apellido,email,contrasenia,rol,fechaRegistro, fechaNacimiento, Id_barrio) VALUES (?,?,?,?,?,?,?,?)';
     try {
         const [rows] = await db.query(sql,
             [
@@ -32,7 +34,8 @@ export const agregarUsuarios = async (req, res) => {
                 contrasenia,
                 rol,
                 fechaRegistro,
-                fechaNacimiento
+                fechaNacimiento,
+                barrio
             ]
         )
         res.status(201).json({
@@ -54,7 +57,7 @@ export const eliminarUsuario = async (req, res) => {
     const { id } = req.params;
     const sql = 'DELETE  FROM usuario WHERE Id_usuario = ?'
     try {
-        const [rows] = await db.query(sql, [id])
+        await db.query(sql, [id])
         res.status(201).json({
             message: 'Usuario eliminado con exito'
         });
@@ -76,18 +79,16 @@ export const actualizarUsuario = async (req, res) => {
         email,
         contrasenia,
         rol,
-        fechaRegistro,
         fechaNacimiento } = req.body;
 
-    const sql = 'UPDATE usuario set nombre = ?, apellido = ?, email = ?, contrasenia = ?, rol = ?, fechaRegistro = ?, fechaNacimiento = ? WHERE Id_usuario = ?';
+    const sql = 'UPDATE usuario set nombre = ?, apellido = ?, email = ?, contrasenia = ?, rol = ?, fechaNacimiento = ? WHERE Id_usuario = ?';
     try {
-        const [rows] = await db.query(sql, [
+        await db.query(sql, [
             nombre,
             apellido,
             email,
             contrasenia,
             rol,
-            fechaRegistro,
             fechaNacimiento,
             id]);
 
