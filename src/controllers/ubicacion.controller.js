@@ -1,7 +1,7 @@
 import db from "../database/db_connect.js"
 
 export const obtenerPaises = async (req,res) => {
-    const sql = 'SELECT * FROM pais'
+    const sql = 'SELECT * FROM pais ORDER BY nombre ASC'
     try {
         const [rows] = await db.query(sql);
         res.json({
@@ -17,7 +17,7 @@ export const obtenerPaises = async (req,res) => {
 
 export const obtenerCiudadByPais = async (req,res) =>{
     const {pais_id} =req.params;
-    const sql = 'SELECT * FROM ciudad WHERE Id_pais = ?'
+    const sql = 'SELECT * FROM ciudad WHERE Id_pais = ? ORDER BY nombre ASC'
     try {
         const [rows] = await db.query(sql, [pais_id]);
         res.json({
@@ -33,7 +33,7 @@ export const obtenerCiudadByPais = async (req,res) =>{
 
 export const obtenerBarrioByCiudad = async (req,res) =>{
     const {ciudad_id}=req.params;
-    const sql = 'SELECT * FROM barrio where Id_ciudad = ?'
+    const sql = 'SELECT * FROM barrio where Id_ciudad = ? ORDER BY nombre ASC'
     try {
         const [rows] = await db.query(sql, [ciudad_id]);
         res.json({
