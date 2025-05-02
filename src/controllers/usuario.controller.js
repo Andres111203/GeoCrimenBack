@@ -103,3 +103,20 @@ export const actualizarUsuario = async (req, res) => {
     }
 
 };
+
+export const validarLogin = async(req,res) =>{
+    const{email,contrasenia}=req.body;
+    const sql = 'SELECT * FROM usuario WHERE email = ? AND contrasenia = ?'
+    try {
+        const [rows] = await db.query(sql, [email, contrasenia])
+        if(rows.length === 0)
+            return res.status(401).json({message: 'Correo o constrasenia incorrectos'});
+        res.status(200).json({
+            mensaje: 'Inicio de sesión exitoso',
+            usuario: rows[0]  // O puedes enviar solo los datos que necesites
+        });
+    } catch (error) {
+        console.error('Error en validarLogin:', error);
+        res.status(500).json({ mensaje: 'Error del servidor' });
+    }
+};
