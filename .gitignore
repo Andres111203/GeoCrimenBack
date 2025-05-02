@@ -2,3 +2,5 @@ node_modules/
 .env  
 src/controllers/auth.controller.js
 src/routes/auth.route.js
+src/controllers/user.controller.js
+src/routes/user.route.js
