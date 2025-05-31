@@ -29,21 +29,22 @@ export const agregarReporte = async (req, res) => {
 
 
     const {
-        Id_usuario,
+        id_usuario,
+        id_ubicacion,
+        id_crimen,
         descripcion,
         ubi_lat,
         ubi_lng,
-        Id_barrio
+        //Id_barrio
     } = req.body;
 
-    // const id_usuario = 1;
-    const id_crimen = 1;
-    const Id_estado = 1;
+    
+    const id_estado = 2;  //por defecto el estado del reporte es "pendiente"
     // const Id_barrio = 1;
     
-    const sql = 'INSERT INTO reporte ( id_usuario, id_crimen, descripcion, ubi_lat, ubi_lng, Id_estado, Id_barrio) VALUES (?,?,?,?,?,?,?)';
+    const sql = 'INSERT INTO Reporte ( id_usuario, id_ubicacion, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado) VALUES (?,?,?,?,?,?,?)';
     try {
-        const [rows] = await db.query(sql, [Id_usuario, id_crimen, descripcion, ubi_lat, ubi_lng, Id_estado, Id_barrio]);
+        const [rows] = await db.query(sql, [id_usuario, id_ubicacion, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado]);
         res.status(201).json({
             message: "Reporte creado",
             id_insertado: rows.insertId
