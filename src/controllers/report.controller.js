@@ -30,24 +30,24 @@ export const agregarReporte = async (req, res) => {
 
     const {
         id_usuario,
-        id_ubicacion,
+        ubicacion_reporte,
         id_crimen,
         descripcion,
         ubi_lat,
         ubi_lng,
-        //Id_barrio
+        fecha_reporte
     } = req.body;
 
     
     const id_estado = 2;  //por defecto el estado del reporte es "pendiente"
     // const Id_barrio = 1;
     
-    const sql = 'INSERT INTO Reporte ( id_usuario, id_ubicacion, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado) VALUES (?,?,?,?,?,?,?)';
+    const sql = 'INSERT INTO Reporte ( id_usuario, ubicacion_reporte, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado, fecha_reporte) VALUES (?,?,?,?,?,?,?,?)';
     try {
-        const [rows] = await db.query(sql, [id_usuario, id_ubicacion, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado]);
+        const [rows] = await db.query(sql, [id_usuario, ubicacion_reporte, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado, fecha_reporte]);
         res.status(201).json({
             message: "Reporte creado",
-            id_insertado: rows.insertId
+            id_reporte_insertado: rows.insertId
         });  
     
     } catch (error) {
@@ -64,3 +64,11 @@ export const eliminarReporte = ()=>{
 export const actualizarReporte = () =>{
 
 };
+
+export const aprobarReporte = async(req, res) =>{
+    const { id } = req.params;
+    const sql = 'INSERT INTO ReaccionesPorReporte (id_reporte, id_tipoReaccion, comentario) VALUES (?, ?, ?, ?, ?)';
+    const {comentario} = req.body;
+    const [rows] = await db.query(sql, [id, 1, comentario]);
+
+}
