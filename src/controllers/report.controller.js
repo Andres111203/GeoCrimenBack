@@ -1,27 +1,58 @@
 import db from "../database/db_connect.js"
+import fetch from 'node-fetch'; 
 
-export const obtenerReportes = async(req,res) =>{
-    const sql = 'SELECT * FROM reporte'
+
+let mostrarReporte = null;
+export const obtenerReportesPendientes = async(req,res) =>{
+    const sql = 'SELECT * FROM Reporte WHERE id_estado = 2 ORDER BY fecha_reporte DESC';
     try{
         const [rows] = await db.query(sql);
             res.json({
                 data: rows
             });
+        console.log(rows);
         }catch(err){
             console.error('Error al momento de obtener el reporte');
             return res.status(500).json({error: "No se pudo generar el listado de los reportes"});
         } 
 };
 
-export const obtenerCoordenadas = async (req, res) => {
-    const sql = 'SELECT ubi_lat, ubi_lng from reporte'
+// export const obtenerCoordenadas = async (req, res) => {
+//     const sql = 'SELECT ubi_lat, ubi_lng from reporte'
+//     try {
+//         const [rows] = await db.query(sql);
+//         res.json({ data: rows });
+//       } catch (err) {
+//         console.error("Error al obtener coordenadas:", err);
+//         return res.status(500).json({ error: "No se pudieron obtener las coordenadas" });
+//       }
+// };
+
+export const obtenerDireccionDesdeCoordenadas = async (req, res) => {
+    const { lat, lng } = req.query;
+    const apiKey = "590f7aa7a4d8496782ccda3353b3c6e4";
+
+    if (!lat || !lng) {
+        return res.status(400).json({ error: "Latitud y longitud son requeridas" });
+    }
+
     try {
-        const [rows] = await db.query(sql);
-        res.json({ data: rows });
-      } catch (err) {
-        console.error("Error al obtener coordenadas:", err);
-        return res.status(500).json({ error: "No se pudieron obtener las coordenadas" });
-      }
+        const response = await fetch(
+            `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}&language=es`
+        );
+
+        const data = await response.json();
+
+        if (data && data.results && data.results.length > 0) {
+            const address = data.results[0].formatted;
+            return res.status(200).json({ address });
+        } else {
+            return res.status(404).json({ error: "No se encontró dirección para esas coordenadas" });
+        }
+    } catch (error) {
+        console.error("Error en OpenCage:", error);
+        return res.status(500).json({ error: "Error al consultar OpenCage" });
+    }
 };
 
 export const agregarReporte = async (req, res) => {
@@ -66,9 +97,62 @@ export const actualizarReporte = () =>{
 };
 
 export const aprobarReporte = async(req, res) =>{
-    const { id } = req.params;
-    const sql = 'INSERT INTO ReaccionesPorReporte (id_reporte, id_tipoReaccion, comentario) VALUES (?, ?, ?, ?, ?)';
+    const { id_reporte } = req.params;
+    const sql = 'INSERT INTO ReaccionesPorReporte (id_reporte, id_tipoReaccion, comentario) VALUES (?, ?, ?)';
     const {comentario} = req.body;
-    const [rows] = await db.query(sql, [id, 1, comentario]);
+    const [rows] = await db.query(sql, [id_reporte, 1, comentario]);
+    if (rows.affectedRows > 0) {
+        const sql = "SELECT mostrarReporte(?) AS mostrar" 
+        const[rows] = await db.query(sql, [id_reporte])
+        mostrarReporte = rows[0].mostrar;
+        if(mostrarReporte) {
+            sql = "UPDATE Reporte SET id_estado = 1 WHERE id_reporte = ?";
+            await db.query(sql, [id_reporte]);
+            res.status(200).json({ message: "Reporte aprobado exitosamente", mostrarReporte });
+        }
+        else{
+           mostrarReporte = false;
+              res.status(200).json({ message: "Reporte aprobado exitosamente", mostrarReporte }); 
+        }
+        
+    } else {
+        res.status(404).json({ error: "Reporte no encontrado" });
+    }
 
+}
+
+export const rechazarReporte = async(req, res) =>{
+    const { id_reporte } = req.params;
+    const sql = 'INSERT INTO ReaccionesPorReporte (id_reporte, id_tipoReaccion, comentario) VALUES (?, ?, ?)';
+    const {comentario} = req.body;
+    const [rows] = await db.query(sql, [id_reporte, 2, comentario]);
+    if (rows.affectedRows > 0) {
+        const sql = "SELECT mostrarReporte(?) AS mostrar" 
+        const[rows] = await db.query(sql, [id_reporte])
+        mostrarReporte = rows[0].mostrar;
+        if(!mostrarReporte) {
+            sql = "UPDATE Reporte SET id_estado = 3 WHERE id_reporte = ?";
+            await db.query(sql, [id_reporte]);
+
+            res.status(200).json({ message: "Reporte rechazado exitosamente", mostrarReporte });
+        }
+        
+        
+    } else {
+        res.status(404).json({ error: "Reporte no encontrado" });
+    }
+
+}
+
+export const ObtenerReportesAprobados = async (req, res) => {
+    sql = 'SELECT id_reporte, id_crimen, ubi_lat, ubi_lng, fecha_reporte, ubicacion_reporte, descripcion, id_estado FROM Reporte WHERE id_estado = 1 ORDER BY fecha_reporte DESC';
+    try {
+        const [rows] = await db.query(sql);
+        res.json({
+            data: rows
+        });
+    } catch (err) {
+        console.error('Error al momento de obtener los reportes aprobados');
+        return res.status(500).json({ error: "No se pudo generar el listado de los reportes aprobados" });
+    }
 }
