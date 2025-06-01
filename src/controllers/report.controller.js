@@ -64,18 +64,18 @@ export const agregarReporte = async (req, res) => {
         ubicacion_reporte,
         id_crimen,
         descripcion,
+        fecha_reporte,
         ubi_lat,
         ubi_lng,
-        fecha_reporte
     } = req.body;
 
     
     const id_estado = 2;  //por defecto el estado del reporte es "pendiente"
     // const Id_barrio = 1;
     
-    const sql = 'INSERT INTO Reporte ( id_usuario, ubicacion_reporte, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado, fecha_reporte) VALUES (?,?,?,?,?,?,?,?)';
+    const sql = 'INSERT INTO Reporte ( id_usuario, ubicacion_reporte, id_crimen, descripcion, id_estado, fecha_reporte, ubi_lat, ubi_lng) VALUES (?,?,?,?,?,?,?,?)';
     try {
-        const [rows] = await db.query(sql, [id_usuario, ubicacion_reporte, id_crimen, descripcion, ubi_lat, ubi_lng, id_estado, fecha_reporte]);
+        const [rows] = await db.query(sql, [id_usuario, ubicacion_reporte, id_crimen, descripcion, id_estado, fecha_reporte, ubi_lat, ubi_lng]);
         res.status(201).json({
             message: "Reporte creado",
             id_reporte_insertado: rows.insertId
@@ -106,7 +106,7 @@ export const aprobarReporte = async(req, res) =>{
         const[rows] = await db.query(sql, [id_reporte])
         mostrarReporte = rows[0].mostrar;
         if(mostrarReporte) {
-            sql = "UPDATE Reporte SET id_estado = 1 WHERE id_reporte = ?";
+            const sql = "UPDATE Reporte SET id_estado = 1 WHERE id_reporte = ?";
             await db.query(sql, [id_reporte]);
             res.status(200).json({ message: "Reporte aprobado exitosamente", mostrarReporte });
         }
@@ -145,7 +145,7 @@ export const rechazarReporte = async(req, res) =>{
 }
 
 export const ObtenerReportesAprobados = async (req, res) => {
-    sql = 'SELECT id_reporte, id_crimen, ubi_lat, ubi_lng, fecha_reporte, ubicacion_reporte, descripcion, id_estado FROM Reporte WHERE id_estado = 1 ORDER BY fecha_reporte DESC';
+    const sql = "SELECT id_reporte, id_crimen, fecha_reporte, ubicacion_reporte, descripcion, ubi_lat, ubi_lng FROM Reporte WHERE id_estado = 1 ORDER BY fecha_reporte DESC";
     try {
         const [rows] = await db.query(sql);
         res.json({

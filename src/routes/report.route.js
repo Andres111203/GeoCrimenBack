@@ -13,7 +13,7 @@ router.delete("/reportes/:id", eliminarReporte);
 
 router.post("/reportes/:id_reporte/aprobar", aprobarReporte);
 router.get("/reportes/reportesPendientes", obtenerReportesPendientes)
-router.get("reportes/reportesActivos", ObtenerReportesAprobados);
+router.get("/reportes/reportesAprobados", ObtenerReportesAprobados);
 router.get("/geocoding", obtenerDireccionDesdeCoordenadas);
 
 
