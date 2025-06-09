@@ -156,3 +156,36 @@ export const ObtenerReportesAprobados = async (req, res) => {
         return res.status(500).json({ error: "No se pudo generar el listado de los reportes aprobados" });
     }
 }
+
+export const agregarArchivoPorReporte = async (req, res) => {
+    const { id_reporte, tipo_archivo, url_archivo } = req.body;
+  
+    try {
+      const sql = 'INSERT INTO archivosPorReporte (id_reporte, tipo_archivo, url_archivo) VALUES (?, ?, ?)';
+      await db.query(sql, [id_reporte, tipo_archivo, url_archivo]);
+  
+      res.status(201).json({ message: "Archivo vinculado al reporte" });
+    } catch (error) {
+      console.error("Error al insertar archivo:", error);
+      res.status(500).json({ error: "Error al insertar archivo por reporte" });
+    }
+  };
+
+export const obtenerArchivosPorReporte = async (req, res) => {
+    const { id_reporte } = req.params;
+  
+    try {
+      const sql = 'SELECT * FROM archivosPorReporte WHERE id_reporte = ?';
+      const [rows] = await db.query(sql, [id_reporte]);
+  
+      if (rows.length > 0) {
+        res.json({ data: rows });
+      } else {
+        res.status(404).json({ message: "No se encontraron archivos para este reporte" });
+      }
+    } catch (error) {
+      console.error("Error al obtener archivos por reporte:", error);
+      res.status(500).json({ error: "Error al obtener archivos por reporte" });
+    }
+  }
+  

@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { obtenerDireccionDesdeCoordenadas, agregarReporte,actualizarReporte,eliminarReporte, aprobarReporte, ObtenerReportesAprobados, obtenerReportesPendientes } from "../controllers/report.controller.js";
+import { obtenerDireccionDesdeCoordenadas, agregarReporte,actualizarReporte,eliminarReporte, aprobarReporte, ObtenerReportesAprobados, obtenerReportesPendientes, agregarArchivoPorReporte, obtenerArchivosPorReporte } from "../controllers/report.controller.js";
 
 const router = Router();
 
@@ -15,6 +15,10 @@ router.post("/reportes/:id_reporte/aprobar", aprobarReporte);
 router.get("/reportes/reportesPendientes", obtenerReportesPendientes)
 router.get("/reportes/reportesAprobados", ObtenerReportesAprobados);
 router.get("/geocoding", obtenerDireccionDesdeCoordenadas);
+router.post("/reportes/archivoPorReporte", agregarArchivoPorReporte);
+router.get("/reportes/obtenerArchivoPorReporte/:id_reporte", obtenerArchivosPorReporte);
+
+
 
 
 export default router;
