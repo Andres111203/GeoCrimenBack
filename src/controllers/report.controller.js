@@ -17,16 +17,6 @@ export const obtenerReportesPendientes = async(req,res) =>{
         } 
 };
 
-// export const obtenerCoordenadas = async (req, res) => {
-//     const sql = 'SELECT ubi_lat, ubi_lng from reporte'
-//     try {
-//         const [rows] = await db.query(sql);
-//         res.json({ data: rows });
-//       } catch (err) {
-//         console.error("Error al obtener coordenadas:", err);
-//         return res.status(500).json({ error: "No se pudieron obtener las coordenadas" });
-//       }
-// };
 
 export const obtenerDireccionDesdeCoordenadas = async (req, res) => {
     const { lat, lng } = req.query;
@@ -188,4 +178,28 @@ export const obtenerArchivosPorReporte = async (req, res) => {
       res.status(500).json({ error: "Error al obtener archivos por reporte" });
     }
   }
+
+export const obtenerReportesPorFecha = async (req, res) => {
+    const { fecha_reporte } = req.query;
+  
+    if (!fecha_reporte) {
+      return res.status(400).json({ error: "La fecha es obligatoria" });
+    }
+  
+    const inicioDia = `${fecha_reporte} 00:00:00`;
+    const finDia = `${fecha_reporte} 23:59:59`;
+  
+    const sql = `
+      SELECT * FROM Reporte 
+      WHERE fecha_reporte BETWEEN ? AND ?
+    `;
+  
+    try {
+      const [rows] = await db.query(sql, [inicioDia, finDia]);
+      res.json({ data: rows });
+    } catch (error) {
+      console.error("Error al obtener reportes por fecha:", error);
+      res.status(500).json({ error: "Error al obtener reportes" });
+    }
+  };
   
