@@ -133,3 +133,17 @@ export const validarLogin = async(req,res) =>{
     }
 };
 
+export const obtenerDatosUsuarioPorId = async (req, res) => {
+    const { id_usuario } = req.params;
+    const sql = 'SELECT Id_usuario, nombre, apellido, email, contrasenia FROM Usuario WHERE Id_usuario = ?';
+    try {
+        const [rows] = await db.query(sql, [id_usuario]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        res.json({ data: rows[0] });
+    } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+        return res.status(500).json({ error: "Error interno al obtener datos del usuario" });
+    }
+}
