@@ -1,5 +1,6 @@
 import db from "../database/db_connect.js"
 import bcrypt from 'bcryptjs';
+import axios from "axios";
 
 
 export const obtenerUsuarios = async (req, res) => {
@@ -111,9 +112,23 @@ export const actualizarUsuario = async (req, res) => {
 };
 
 export const validarLogin = async(req,res) =>{
-    const{email,contrasenia}=req.body;
-    const sql = 'SELECT * FROM Usuario WHERE email = ? AND contrasenia = ?'
+    const{email,contrasenia, token}=req.body;
+    if (!token) {
+        return res.status(400).json({ mensaje: "Falta el token de reCAPTCHA" });
+    }
+    
     try {
+
+        const secretKey = "6Ld2xVorAAAAAMRqCio1cPK9DzTn74oGAkATeFIc"; // TU CLAVE SECRETA
+
+        const { data } = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`
+        );
+
+        if (!data.success) {
+        return res.status(401).json({ mensaje: "reCAPTCHA inválido" });
+        }
+        const sql = 'SELECT * FROM Usuario WHERE email = ? AND contrasenia = ?'
         const [rows] = await db.query(sql, [email, contrasenia])
         if(rows.length === 0)return res.status(401).json({message: 'Correo o constrasenia incorrectos'});
         const usuario = rows[0];

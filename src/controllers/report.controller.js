@@ -135,7 +135,7 @@ export const rechazarReporte = async(req, res) =>{
 }
 
 export const ObtenerReportesAprobados = async (req, res) => {
-    const sql = "SELECT id_reporte, id_crimen, fecha_reporte, ubicacion_reporte, descripcion, ubi_lat, ubi_lng FROM Reporte WHERE id_estado = 1 ORDER BY fecha_reporte DESC";
+    const sql = "SELECT id_reporte, id_crimen, fecha_reporte, ubicacion_reporte, descripcion FROM Reporte WHERE id_estado = 1 ORDER BY fecha_reporte DESC";
     try {
         const [rows] = await db.query(sql);
         res.json({
