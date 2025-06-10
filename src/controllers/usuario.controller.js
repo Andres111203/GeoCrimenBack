@@ -27,33 +27,31 @@ export const agregarUsuarios = async (req, res) => {
         contrasenia,
         rol,
         fechaNacimiento,
-        barrio } = req.body
+         } = req.body
     const hashedPassword = await bcrypt.hash(contrasenia, 10);
 
     const fechaRegistro = new Date();
-    const sql = 'INSERT INTO Usuario (nombre,apellido,email,contrasenia,rol,fechaRegistro, fechaNacimiento) VALUES (?,?,?,?,?,?,?)';
+    const sql = 'INSERT INTO Usuario (nombre,apellido,email,contrasenia,rol,fechaRegistro,fechaNacimiento) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id_usuario';
     try {
-        const [rows] = await db.query(sql,
-            [
-                nombre,
-                apellido,
-                email,
-                hashedPassword,
-                rol,
-                fechaRegistro,
-                fechaNacimiento
-            ]
-        )
+        const result = await db.query(sql, [
+            nombre,
+            apellido,
+            email,
+            hashedPassword,
+            rol,
+            fechaRegistro,
+            fechaNacimiento
+          ]);
         res.status(201).json({
             message: "Usuario creado",
-            id_insertado: rows.insertId
+            id_usuario_insertado: result.rows[0].id_usuario
         });
-        console.log("Usuario insertado con éxito:", rows.insertId);
+        console.log("Usuario insertado con éxito:",  result.rows[0].id_usuario);
     } catch (error) {
         console.error("Error al insertar nuevo usuario:", error);
         return res.status(500).json(
             {
-                message: "Error interno al insertar reporte",
+                message: "Error interno al insertar usuario",
                 error: error.message
             });
 
@@ -128,20 +126,22 @@ export const validarLogin = async(req,res) =>{
         if (!data.success) {
         return res.status(401).json({ mensaje: "reCAPTCHA inválido" });
         }
-        const sql = 'SELECT * FROM Usuario WHERE email = ? AND contrasenia = ?'
-        const [rows] = await db.query(sql, [email, contrasenia])
+        const sql = 'SELECT * FROM Usuario WHERE email = $1'
+        const result = await db.query(sql, [email]);
+        const rows = result.rows;
+        
         if(rows.length === 0)return res.status(401).json({message: 'Correo o constrasenia incorrectos'});
         const usuario = rows[0];
         const isPasswordValid = await bcrypt.compare(contrasenia, usuario.contrasenia);
         // if (!isPasswordValid) {
         //     return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
         // }
-
+        console.log('Usuario encontrado:', rows[0]);
         res.status(200).json({
             mensaje: 'Inicio de sesión exitoso',
-            id_usuario: usuario.Id_usuario
+            id_usuario: rows[0].id_usuario
         });
-        console.log('Usuario logueado con éxito:', usuario.Id_usuario);
+        console.log('Usuario logueado con éxito:', rows[0].id_usuario);
     } catch (error) {
         console.error('Error en validarLogin:', error);
         res.status(500).json({ mensaje: 'Error del servidor' });
