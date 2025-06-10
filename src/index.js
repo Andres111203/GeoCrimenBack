@@ -9,7 +9,7 @@ import extraerUbicacion from './routes/ubicacion.route.js';
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 
 app.use(cors());

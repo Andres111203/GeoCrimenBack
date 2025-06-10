@@ -206,7 +206,7 @@ export const ObtenerReportesAprobados = async (req, res) => {
   
 export const agregarArchivoPorReporte = async (req, res) => {
     const { id_reporte, tipo_archivo, url_archivo } = req.body;
-  
+    console.log("Datos del archivo:", req.body);
     try {
       const sql = 'INSERT INTO archivoporreporte (id_reporte, tipo_archivo, url_archivo) VALUES ($1, $2, $3)';
       await db.query(sql, [id_reporte, tipo_archivo, url_archivo]);
@@ -220,11 +220,13 @@ export const agregarArchivoPorReporte = async (req, res) => {
   
 
   export const obtenerArchivosPorReporte = async (req, res) => {
-    const { idReporte } = req.params;
-    const sql = 'SELECT * FROM ArchivoPorReporte WHERE id_reporte = $1';
-  
+    const {id_reporte} = req.params;
+            
+    console.log("ID del reporte para obtener archivos:", id_reporte);
+    const sql = 'SELECT id_archivoReporte, id_reporte, url_archivo, tipo_archivo FROM ArchivoPorReporte WHERE id_reporte = $1';
     try {
-      const result = await db.query(sql, [idReporte]);
+      const result = await db.query(sql, [id_reporte]);
+      console.log("Archivos obtenidos:", result.rows);
       res.json({ data: result.rows });
     } catch (error) {
       console.error('Error al obtener archivos por reporte:', error);
