@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express'
-import userRouter from './routes/user.route.js'
 import reportRoute from './routes/report.route.js'
 import usuarioRoute from './routes/usuario.route.js'
 import morgan from 'morgan';
@@ -17,7 +16,6 @@ app.use(cors());
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-app.use('/api/users', userRouter)
 app.use('/api', reportRoute);
 app.use('/api', usuarioRoute);
 

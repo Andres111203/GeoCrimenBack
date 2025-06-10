@@ -57,24 +57,22 @@ export const agregarUsuarios = async (req, res) => {
 
     }
 };
-
 export const eliminarUsuario = async (req, res) => {
-    const { id } = req.params;
-    const sql = 'DELETE  FROM usuario WHERE Id_usuario = ?'
+    const { id_usuario } = req.params;
+    const sql = 'DELETE FROM usuario WHERE id_usuario = $1';
+  
     try {
-        await db.query(sql, [id])
-        res.status(201).json({
-            message: 'Usuario eliminado con exito'
-        });
+      await db.query(sql, [id_usuario]);
+      res.status(200).json({
+        message: 'Usuario eliminado con éxito'
+      });
     } catch (error) {
-        console.error('Error al eliminar al usuario');
-        return res.status(500).json({
-            error: error.message
-
-        });
-
+      console.error('Error al eliminar al usuario:', error);
+      return res.status(500).json({
+        error: error.message
+      });
     }
-};
+  };
 
 export const actualizarUsuario = async (req, res) => {
     const { id } = req.params;
@@ -150,15 +148,28 @@ export const validarLogin = async(req,res) =>{
 
 export const obtenerDatosUsuarioPorId = async (req, res) => {
     const { id_usuario } = req.params;
-    const sql = 'SELECT Id_usuario, nombre, apellido, email, contrasenia FROM Usuario WHERE Id_usuario = ?';
+    const sql = `
+      SELECT 
+        id_usuario, 
+        nombre, 
+        apellido, 
+        email, 
+        contrasenia 
+      FROM Usuario 
+      WHERE id_usuario = $1
+    `;
+  
     try {
-        const [rows] = await db.query(sql, [id_usuario]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-        res.json({ data: rows[0] });
+      const result = await db.query(sql, [id_usuario]);
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+  
+      res.json({ data: result.rows[0] });
     } catch (error) {
-        console.error('Error al obtener datos del usuario:', error);
-        return res.status(500).json({ error: "Error interno al obtener datos del usuario" });
+      console.error('Error al obtener datos del usuario:', error);
+      return res.status(500).json({ error: "Error interno al obtener datos del usuario" });
     }
-}
+  };
+  

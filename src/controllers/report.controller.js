@@ -6,7 +6,7 @@ let mostrarReporte = null;
 export const obtenerReportesPendientes = async (req, res) => {
     const sql = 'SELECT * FROM Reporte WHERE id_estado = $1 ORDER BY fecha_reporte DESC';
     try {
-      const result = await db.query(sql, [2]);  // Usamos parámetro posicional $1 para seguridad
+      const result = await db.query(sql, [2]);  
       res.json({
         data: result.rows
       });
@@ -56,7 +56,7 @@ export const agregarReporte = async (req, res) => {
       ubi_lng,
     } = req.body;
     console.log("Datos del reporte:", req.body);
-    const id_estado = 2; // estado pendiente
+    const id_estado = 2; 
   
     const sql = `
       INSERT INTO Reporte (
@@ -111,12 +111,10 @@ export const aprobarReporte = async (req, res) => {
     console.log("ID del reporte a aprobar:", id_reporte);
   
     try {
-      // Insertar reacción de aprobación
       const insertSql = 'INSERT INTO ReaccionesPorReporte (id_reporte, id_tipoReaccion, comentario) VALUES ($1, $2, $3)';
       const insertResult = await db.query(insertSql, [id_reporte, 1, comentario]);
   
       if (insertResult.rowCount > 0) {
-        // Llamar función mostrarReporte con sintaxis PostgreSQL
         const mostrarSql = 'SELECT mostrarReporte($1) AS mostrar';
         const mostrarResult = await db.query(mostrarSql, [id_reporte]);
   
@@ -163,7 +161,6 @@ export const aprobarReporte = async (req, res) => {
         const mostrarReporte = funcionResult.rows[0].mostrar;
   
         if (!mostrarReporte) {
-          // Si no debe mostrarse, se actualiza el estado a rechazado (3)
           const updateSql = `UPDATE Reporte SET id_estado = 3 WHERE id_reporte = $1`;
           await db.query(updateSql, [id_reporte]);
         }
@@ -197,7 +194,7 @@ export const ObtenerReportesAprobados = async (req, res) => {
     `;
   
     try {
-      const result = await db.query(sql, [1]); // Usamos $1 en lugar de escribir el valor directamente
+      const result = await db.query(sql, [1]); 
       res.json({
         data: result.rows
       });
@@ -259,14 +256,14 @@ export const agregarArchivoPorReporte = async (req, res) => {
       res.status(500).json({ error: "Error al obtener reportes" });
     }
   };
-  export const obtenerReportesRegistrados = async () => {
+  export const obtenerReportesRegistrados = async (req, res) => {
     const sql = `
       SELECT 
         id_reporte,
         CASE 
             WHEN id_crimen = 1 THEN 'Hurto'
-            WHEN id_crimen = 2 THEN 'Homicidio, 
-        END AS tipo_crimen
+            WHEN id_crimen = 2 THEN 'Homicidio' 
+        END AS tipo_crimen,
         descripcion, 
         ubicacion_reporte, 
         fecha_reporte, 
@@ -274,13 +271,14 @@ export const agregarArchivoPorReporte = async (req, res) => {
             WHEN id_estado = 1 THEN 'Aprobado'
             WHEN id_estado = 2 THEN 'Pendiente'
             WHEN id_estado = 3 THEN 'Rechazado'
+        END AS estado_reporte
       FROM Reporte
       ORDER BY fecha_reporte DESC
     `;
   
     try {
       const result = await db.query(sql);
-      return result.rows; // retorna todos los reportes
+      res.status(200).json({ data: result.rows }); 
     } catch (error) {
       console.error("Error al mostrar reporte de hechos:", error);
       throw new Error("Error al mostrar reporte de hechos");
